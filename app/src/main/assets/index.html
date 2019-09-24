@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="user-scalable=no">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1">
+
+  <title>demo</title>
+</head>
+<style>
+  html {
+    height: 100vh;
+    font-size: 16px;
+  }
+
+  body {
+    background: #019fe8 url(https://zos.alipayobjects.com/rmsportal/eFatlrQCyUQVBoalzBPS.png) no-repeat top;
+    background-size: 100%;
+    text-align: center;
+  }
+
+  #box {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 60%;
+    margin: auto;
+    width: 70%;
+  }
+
+  #open-app,
+  #download-app {
+    touch-action: none;
+    cursor: pointer;
+    height: 3.05rem;
+    line-height: 3.05rem;
+    color: #1b99dc;
+    background: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: .041667rem;
+    border: 1px solid transparent;
+    border-radius: .1rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<body>
+  <div id="box">
+    <div id="open-app" onclick="openApp()">打开支付宝</div>
+    <div id="download-app" onclick="downloadAapp()">下载支付宝</div>
+  </div>
+  <script>
+    // 默认是安卓路径，通过cookie取参数
+    var openURL = 'alipays://platformapi/startapp?appId=20000001';
+    var downloadAndoidApk = 'https://t.alipayobjects.com/L1/71/100/and/alipay_wap_dc.apk';
+    var downloadIOS = 'itms-apps://itunes.apple.com/app/zhi-fu-bao/id333206289?mt=8';
+
+    function detectVersion() {
+      let isAndroid, isIOS, isIOS9, version,
+        u = navigator.userAgent,
+        ua = u.toLowerCase();
+
+      if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //android终端或者uc浏览器
+        //Android系统
+        isAndroid = true
+      }
+
+      if (ua.indexOf("like mac os x") > 0) {
+        //ios
+        var regStr_saf = /os [\d._]*/gi;
+        var verinfo = ua.match(regStr_saf);
+        version = (verinfo + "").replace(/[^0-9|_.]/ig, "").replace(/_/ig, ".");
+      }
+      var version_str = version + "";
+      if (version_str != "undefined" && version_str.length > 0) {
+        version = parseInt(version)
+        if (version >= 8) {
+          // ios9以上
+          isIOS9 = true
+        } else {
+          isIOS = true
+        }
+      }
+      return {
+        isAndroid,
+        isIOS,
+        isIOS9
+      }
+    }
+
+    function openUrl(url) {
+      let {
+        isAndroid,
+        isIOS,
+        isIOS9
+      } = detectVersion()
+      if (isAndroid || isIOS) {
+        var ifr = document.createElement("iframe");
+        ifr.setAttribute('src', url);
+        ifr.setAttribute('style', 'display:none');
+        document.body.appendChild(ifr);
+        setTimeout(() => {
+          document.body.removeChild(ifr);
+        }, 300);
+      }
+
+      if (isIOS9) {
+        location.href = url;
+      }
+    }
+
+    // 打开app
+    function openApp() {
+      let {
+        isAndroid,
+        isIOS,
+        isIOS9
+      } = detectVersion()
+      if (isIOS || isIOS9) {
+        // openURL =''; //苹果打开路径
+      }
+      openUrl(openURL)
+    }
+    // 下载app
+    function downloadAapp(params) {
+      let {
+        isAndroid,
+        isIOS,
+        isIOS9
+      } = detectVersion()
+      if (isAndroid) {
+        window.location = downloadAndoidApk
+      }
+      if (isIOS || isIOS9) {
+        openUrl(downloadIOS)
+      }
+    }
+    // 默认加载
+    window.onload = function () {
+      openApp();
+    }
+  </script>
+
+
+</body>
+
+</html>
